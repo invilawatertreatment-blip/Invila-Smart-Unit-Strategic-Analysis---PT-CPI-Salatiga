@@ -52,18 +52,16 @@ const useOdometer = (target, duration = 2000, trigger = true) => {
   return count;
 };
 
+/**
+ * Format angka ke format Indonesia (titik sebagai pemisah ribuan)
+ */
 const formatIDN = (num) => {
   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
 };
 
-const formatRupiah = (num) => {
-  return new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0,
-  }).format(num);
-};
-
+/**
+ * Komponen Kartu Proyek Individual
+ */
 const ProjectCard = ({ project, index, isVisible }) => {
   const animatedCap = useOdometer(project.capacity, 1500 + index * 100, isVisible);
 
@@ -118,8 +116,21 @@ export default function App() {
   const financialChartInstance = useRef(null);
   const scadaChartInstance = useRef(null);
 
-  const logoUrl = "https://raw.githubusercontent.com/invilawatertreatment-blip/invila-odometer/main/invila-treatment-unit.png";
+  const baseUrl = "https://raw.githubusercontent.com/invilawatertreatment-blip/invila-odometer/main/";
+  const logoUrl = `${baseUrl}invila-treatment-unit.png`;
   
+  const clientLogos = [
+    "tirtanadi.png",
+    "kievit.png",
+    "kiw.png",
+    "petrokimia-gresik.png",
+    "united-tractors.png",
+    "patria-maritim-perkasa.png",
+    "tirta-asasta-depok.png",
+    "wika.png",
+    "cemerlang-samudra-kontrindo.png"
+  ];
+
   const projects = [
     { id: 1, name: "Clarifier 6 PDAM Tirtanadi Sunggal", location: "Medan-Sunggal", year: "2013", client: "PDAM Tirtanadi", capacity: 1296000 },
     { id: 2, name: "Clarifier 1 PDAM Tirtanadi Sunggal", location: "Medan-Sunggal", year: "2014", client: "PDAM Tirtanadi", capacity: 1296000 },
@@ -133,23 +144,41 @@ export default function App() {
   ];
 
   const phases = [
-    { id: 'p1', name: '1. AERO-PULSE', title: 'Optimalisasi Hidrolika, Invila Aero-Schocks', desc: ' Bayangkan lumpur di dalam air limbah itu seperti "balon udara kecil". Karena proses aerasi di Active Sludge (MBBR Tank) yang sangat kuat di tahap sebelumnya, lumpur tersebut terjebak oleh gelembung udara mikroskopis sehingga mereka jadi ringan dan terus mengapung di permukaan Tank Lamella Existing, tidak mau tenggelam.
-Bagaimana Aero-Shock Melucuti gelembung udara (vortex mikro) dari flok biologi MBBR di tangki eksisting agar lumpur menjadi berat dan tidak mengapung?
-1.	Tembakan Kejutan: Alat ini memberikan "hentakan" udara bertekanan secara tiba-tiba (hanya selama 0,5 detik) di jalur air masuk.
-2.	Melucuti Gelembung: Hentakan ini berfungsi seperti menepuk balon; ia melepaskan gelembung udara yang menempel pada lumpur.
-3.	Lumpur Tenggelam: Begitu gelembungnya lepas, lumpur menjadi berat kembali secara alami dan langsung terjun jatuh ke dasar tangki. Hasilnya, air di permukaan menjadi jernih dan tidak lagi membawa kotoran yang mengapung.
-.', result: 'Penurunan potensi flok mengambang secara terukur.' },
-    { id: 'p2', name: '2. ZERO-SALT DOSING', title: 'Pengikatan Non-Garam', desc: ' Injeksi polimer kationik organik untuk mengikat kotoran tanpa menambah beban garam (Klorida/TDS) ke dalam air, sehingga TDS terjaga ', result: 'TDS terkendali sesuai parameter dasar.' },
-    { id: 'p3', name: '3. HYBRID LAMELLA', title: 'Pemisahan Fisik', desc: Invila™ Hybrid Lamella Clarifier merupakan unit high-rate sedimentation yang dirancang untuk
-menjawab kebutuhan instalasi pengolahan air modern yang menghadapi keterbatasan lahan, tuntutan
-kapasitas tinggi, dan kebutuhan akan kinerja efluen yang stabil. Sistem ini dikembangkan dengan
-pendekatan engineering-based design, di mana kinerja pengendapan tidak hanya bergantung pada
-volume atau waktu tinggal, tetapi dikendalikan secara langsung oleh geometri lamella dan hydraulic
-boundary conditions sehingga foot print 50% lebih hemat.
-Berbeda dengan sistem konvensional yang sering mengandalkan asumsi aliran ideal, Invila™ dirancang
-untuk bekerja secara konsisten pada kondisi operasi nyata, termasuk variasi debit dan kualitas air baku. ', result: 'Kekeruhan ditargetkan < 1 NTU.' },
-    { id: 'p4', name: '4. Smart Aero-Carbon & Sand& Filter (SACF), title: 'Pemolesan Parameter', desc: 'Adsorpsi polutan organik dan gas terlarut menggunakan media karbon aktif, Filtrasi media Silica Sand & Karbon Aktif premium untuk menyerap bau amis, warna, dan sisa bahan organik hingga COD < 20 mg/L..', result: 'Menghilangkan potensi bau & warna organik.' },
-    { id: 'p5', name: '5. STERILISASI & BLENDING', title: 'Penyelesaian Kualitas', desc: ' Injeksi klorin dosis presisi untuk membunuh bakteri (E. Coli = 0) dan pencampuran 10-15% air segar untuk mengunci TDS < 300 mg/L.Proses sterilisasi terkontrol dan skema pencampuran cerdas (blending) untuk memastikan kepatuhan standar mutu pangan.', result: 'Target Mutu: E. Coli 0' }
+    { 
+      id: 'p1', 
+      name: '1. AERO-PULSE', 
+      title: 'Optimalisasi Hidrolika, Invila Aero-Shocks', 
+      desc: 'Bayangkan lumpur di dalam air limbah itu seperti "balon udara kecil". Karena proses aerasi di Active Sludge (MBBR Tank) yang sangat kuat, lumpur terjebak oleh gelembung udara mikroskopis sehingga menjadi ringan dan mengapung di permukaan Tank Lamella Existing. Aero-Shock memberikan "hentakan" udara bertekanan selama 0,5 detik di jalur air masuk untuk melucuti gelembung (vortex mikro) tersebut. Begitu gelembungnya lepas, lumpur menjadi berat kembali secara alami dan langsung jatuh ke dasar tangki.', 
+      result: 'Penurunan potensi flok mengambang secara terukur.' 
+    },
+    { 
+      id: 'p2', 
+      name: '2. ZERO-SALT DOSING', 
+      title: 'Pengikatan Non-Garam', 
+      desc: 'Injeksi polimer kationik organik untuk mengikat kotoran tanpa menambah beban garam (Klorida/TDS) ke dalam air. Strategi ini memastikan TDS tetap terjaga di bawah ambang batas tanpa menggunakan Reverse Osmosis.', 
+      result: 'TDS terkendali sesuai parameter dasar.' 
+    },
+    { 
+      id: 'p3', 
+      name: '3. HYBRID LAMELLA', 
+      title: 'Pemisahan Fisik', 
+      desc: 'Invila™ Hybrid Lamella Clarifier merupakan unit high-rate sedimentation yang dirancang untuk kinerja efluen yang stabil pada lahan terbatas. Kinerja pengendapan dikendalikan secara langsung oleh geometri lamella dan hydraulic boundary conditions sehingga footprint 50% lebih hemat dibandingkan sistem konvensional.', 
+      result: 'Kekeruhan ditargetkan < 1 NTU.' 
+    },
+    { 
+      id: 'p4', 
+      name: '4. Smart Aero-Carbon (SACF)', 
+      title: 'Pemolesan Parameter', 
+      desc: 'Adsorpsi polutan organik dan gas terlarut menggunakan media Karbon Aktif premium serta filtrasi Silica Sand. Tahap ini menyerap bau amis, warna, dan sisa bahan organik hingga COD < 20 mg/L untuk standar air higienis.', 
+      result: 'Menghilangkan potensi bau & warna organik.' 
+    },
+    { 
+      id: 'p5', 
+      name: '5. STERILISASI & BLENDING', 
+      title: 'Penyelesaian Kualitas', 
+      desc: 'Injeksi klorin dosis presisi untuk membunuh bakteri (E. Coli = 0) dan pencampuran 10-15% air segar untuk mengunci TDS < 300 mg/L. Proses ini memastikan kepatuhan standar mutu pangan sesuai Permenkes No. 2 Tahun 2023.', 
+      result: 'Target Mutu: E. Coli 0 (Mutlak)' 
+    }
   ];
 
   const totalMonthly = 6500700;
@@ -162,31 +191,17 @@ untuk bekerja secara konsisten pada kondisi operasi nyata, termasuk variasi debi
     return () => clearTimeout(timer);
   }, []);
 
-  // Charts Logic
   useEffect(() => {
     if (isVisible) {
-      // Financial Chart
       if (financialChartInstance.current) financialChartInstance.current.destroy();
       const finCtx = financialChartRef.current.getContext('2d');
-      const months = Array.from({length: 12}, (_, i) => `Bln ${i+1}`);
-      const capMonthly = 30000;
-      const pdamRate = 14600;
-      const invilaRate = 5500;
-      let cumP = 0; let cumI = 0;
-      const dataP = []; const dataI = [];
-      for(let i=0; i<12; i++) {
-        cumP += (capMonthly * pdamRate);
-        cumI += (capMonthly * invilaRate);
-        dataP.push(cumP); dataI.push(cumI);
-      }
-
       financialChartInstance.current = new Chart(finCtx, {
         type: 'line',
         data: {
-          labels: months,
+          labels: Array.from({length: 12}, (_, i) => `Bln ${i+1}`),
           datasets: [
-            { label: 'Baseline (PDAM)', data: dataP, borderColor: '#94a3b8', borderDash: [5, 5], fill: false, pointRadius: 0 },
-            { label: 'Proyeksi (Invila)', data: dataI, borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', fill: true, borderWidth: 3 }
+            { label: 'Baseline (PDAM)', data: Array.from({length: 12}, (_, i) => (i+1) * 30000 * 14600), borderColor: '#94a3b8', borderDash: [5, 5], fill: false, pointRadius: 0 },
+            { label: 'Proyeksi (Invila)', data: Array.from({length: 12}, (_, i) => (i+1) * 30000 * 5500), borderColor: '#2563eb', backgroundColor: 'rgba(37, 99, 235, 0.1)', fill: true, borderWidth: 3 }
           ]
         },
         options: {
@@ -197,15 +212,13 @@ untuk bekerja secara konsisten pada kondisi operasi nyata, termasuk variasi debi
         }
       });
 
-      // SCADA Chart
       if (scadaChartInstance.current) scadaChartInstance.current.destroy();
       const scadaCtx = scadaChartRef.current.getContext('2d');
-      const tdsData = Array.from({length: 20}, () => 275 + Math.random() * 15);
       scadaChartInstance.current = new Chart(scadaCtx, {
         type: 'line',
         data: {
           labels: Array.from({length: 20}, (_, i) => `T-${20-i}m`),
-          datasets: [{ data: tdsData, borderColor: '#2dd4bf', backgroundColor: 'rgba(45, 212, 191, 0.1)', fill: true, tension: 0.4, pointRadius: 0 }]
+          datasets: [{ data: Array.from({length: 20}, () => 275 + Math.random() * 15), borderColor: '#2dd4bf', backgroundColor: 'rgba(45, 212, 191, 0.1)', fill: true, tension: 0.4, pointRadius: 0 }]
         },
         options: {
           responsive: true,
@@ -245,7 +258,7 @@ untuk bekerja secara konsisten pada kondisi operasi nyata, termasuk variasi debi
 
       <main className="max-w-7xl mx-auto p-4 md:p-8 space-y-20">
         
-        {/* Hero Header */}
+        {/* Hero Section */}
         <section className="pt-10 flex flex-col md:flex-row md:items-end justify-between gap-8">
           <div className="space-y-6">
             <div className="flex flex-col gap-4">
@@ -261,7 +274,8 @@ untuk bekerja secara konsisten pada kondisi operasi nyata, termasuk variasi debi
               <span className="text-blue-600 underline decoration-blue-200 underline-offset-8">Rekam Jejak Operasional</span>
             </h2>
             <p className="text-slate-500 max-w-2xl text-lg leading-relaxed">
-              Rencana transformasi air limbah menjadi air produksi sesuai standar mutu pangan. Dirancang untuk potensi optimasi biaya utilitas melalui sistem integrasi yang <strong>tidak mengubah struktur aset eksisting</strong>.
+              Rencana transformasi air limbah menjadi air produksi sesuai standar mutu pangan. 
+              Dirancang untuk potensi optimasi biaya utilitas melalui sistem integrasi yang <strong>tidak mengubah struktur aset eksisting</strong>.
             </p>
           </div>
           
@@ -271,7 +285,7 @@ untuk bekerja secara konsisten pada kondisi operasi nyata, termasuk variasi debi
           </button>
         </section>
 
-        {/* Financial Section */}
+        {/* Optimasi Section */}
         <section id="optimasi" className="space-y-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
@@ -321,7 +335,7 @@ untuk bekerja secara konsisten pada kondisi operasi nyata, termasuk variasi debi
           </div>
         </section>
 
-        {/* SCADA & Technology Section */}
+        {/* Teknologi Section */}
         <section id="teknologi" className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           <div className="lg:col-span-4 space-y-4">
             <div className="flex items-center gap-2 mb-4">
@@ -342,10 +356,10 @@ untuk bekerja secara konsisten pada kondisi operasi nyata, termasuk variasi debi
             ))}
           </div>
 
-          <div className="lg:col-span-8 bg-white rounded-3xl p-8 border border-slate-200 shadow-sm min-h-[400px] flex flex-col">
+          <div className="lg:col-span-8 bg-white rounded-3xl p-8 border border-slate-200 shadow-sm min-h-[450px] flex flex-col">
             <div className="flex-grow space-y-4">
               <h4 className="text-2xl font-black text-slate-800">{phases[activePhase].title}</h4>
-              <p className="text-slate-500 leading-relaxed text-lg">{phases[activePhase].desc}</p>
+              <p className="text-slate-500 leading-relaxed text-base whitespace-pre-line">{phases[activePhase].desc}</p>
               <div className="bg-slate-50 p-6 rounded-2xl border border-slate-100 mt-6">
                 <p className="text-[10px] font-black text-slate-400 uppercase mb-2">Target Mutu Pasca-Tahapan</p>
                 <p className="font-bold text-blue-700">{phases[activePhase].result}</p>
@@ -364,7 +378,7 @@ untuk bekerja secara konsisten pada kondisi operasi nyata, termasuk variasi debi
           </div>
         </section>
 
-        {/* POPULASI SECTION - NEW INTERACTIVE ODOMETER DESIGN */}
+        {/* Populasi Section */}
         <section id="populasi" className="space-y-10">
           <div className="bg-slate-900 rounded-[2.5rem] p-8 md:p-12 text-white relative overflow-hidden shadow-2xl shadow-blue-200">
             <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
@@ -423,7 +437,26 @@ untuk bekerja secara konsisten pada kondisi operasi nyata, termasuk variasi debi
           </div>
         </section>
 
-        {/* Risk & Mitigation */}
+        {/* Logo Klien Section */}
+        <section className="pt-10 space-y-10">
+           <div className="text-center">
+             <h4 className="text-xs font-bold text-slate-400 uppercase tracking-[0.3em]">Dipercaya Oleh Mitra Industri</h4>
+           </div>
+           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-12 items-center opacity-70 grayscale hover:grayscale-0 transition-all duration-700 px-6">
+              {clientLogos.map((logo, idx) => (
+                <div key={idx} className="flex justify-center">
+                   <img 
+                      src={`${baseUrl}${logo}`} 
+                      alt="Mitra Klien Invila" 
+                      className="h-14 md:h-16 w-auto object-contain hover:scale-110 transition-transform cursor-pointer"
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                   />
+                </div>
+              ))}
+           </div>
+        </section>
+
+        {/* Manajemen Risiko Section */}
         <section className="bg-white rounded-[2.5rem] p-8 md:p-12 border border-slate-200 shadow-sm">
            <div className="max-w-3xl space-y-6">
              <h3 className="text-3xl font-black text-slate-800">Manajemen Risiko & Keamanan Aset</h3>
